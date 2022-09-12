@@ -20,4 +20,4 @@ if (process.env.NODE_ENV === 'production') {
 export const S3_BUCKET_URL = `https://${S3_BUCKET_NAME}.s3.amazonaws.com`;
 export const MAX_FILE_SIZE_BYTES = 1000000;
 
-export {REGION, API_BASE_URL};
+export { REGION, API_BASE_URL };

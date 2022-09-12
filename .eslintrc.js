@@ -20,7 +20,7 @@ module.exports = {
     'jest/globals': true,
     jest: true,
   },
-  parserOptions: {ecmaVersion: 8},
+  parserOptions: { ecmaVersion: 8 },
   extends: ['eslint:recommended'],
   overrides: [
     // This configuration will apply only to TypeScript files
@@ -65,7 +65,7 @@ module.exports = {
         'jsx-a11y/click-events-have-key-events': 'off',
         'no-use-before-define': [
           'error',
-          {functions: false, classes: true, variables: true},
+          { functions: false, classes: true, variables: true },
         ],
         'no-console': 'off',
         'no-unused-vars': 'off',

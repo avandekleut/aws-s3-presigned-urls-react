@@ -1,5 +1,5 @@
-import {useReducer} from 'react';
-import {MAX_FILE_SIZE_BYTES} from 'src/constants';
+import { useReducer } from 'react';
+import { MAX_FILE_SIZE_BYTES } from 'src/constants';
 
 const initialFileState = {
   fileError: null,
@@ -17,7 +17,7 @@ function bytesToMb(bytes: number) {
 
 export function useFileChange() {
   const [
-    {fileError, fileContents, fileName, fileSize, fileType},
+    { fileError, fileContents, fileName, fileSize, fileType },
     fileDispatch,
   ] = useReducer(fileChangeReducer, initialFileState);
 
@@ -87,8 +87,8 @@ type FileChangeAction =
       fileType: string;
       fileContents: File;
     }
-  | {type: 'FILE_CHANGE_FAILURE'; fileError: string}
-  | {type: 'RESET_FILE_STATE'};
+  | { type: 'FILE_CHANGE_FAILURE'; fileError: string }
+  | { type: 'RESET_FILE_STATE' };
 
 export function fileChangeReducer(
   _state: FileState,
