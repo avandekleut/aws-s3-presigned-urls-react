@@ -1,7 +1,7 @@
-import { FormEvent, useState } from 'react';
-import { S3_BUCKET_URL } from 'src/constants';
-import { uploadToS3 } from './upload-file';
-import { useFileChange } from './use-file-change';
+import { FormEvent, useState } from 'react'
+import { S3_BUCKET_URL } from 'src/constants'
+import { uploadToS3 } from './upload-file'
+import { useFileChange } from './use-file-change'
 
 const Home: React.FC = () => {
   const {
@@ -11,23 +11,23 @@ const Home: React.FC = () => {
     fileType,
     fileDispatch,
     handleFileChange,
-  } = useFileChange();
-  const [s3FileUrl, setS3FileUrl] = useState('');
+  } = useFileChange()
+  const [s3FileUrl, setS3FileUrl] = useState('')
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
       if (fileType && fileContents) {
-        const filePath = await uploadToS3({ fileType, fileContents });
-        setS3FileUrl(`${S3_BUCKET_URL}/${filePath}`);
-        console.log('filePath is', filePath);
-        fileDispatch({ type: 'RESET_FILE_STATE' });
+        const filePath = await uploadToS3({ fileType, fileContents })
+        setS3FileUrl(`${S3_BUCKET_URL}/${filePath}`)
+        console.log('filePath is', filePath)
+        fileDispatch({ type: 'RESET_FILE_STATE' })
       }
     } catch (err) {
-      console.log('error is', err);
+      console.log('error is', err)
     }
-  };
+  }
   return (
     <>
       <div className="w-full">
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

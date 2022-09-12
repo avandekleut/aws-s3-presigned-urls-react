@@ -25,7 +25,7 @@ module.exports = {
   rules: {
     'no-use-before-define': [
       'error',
-      {functions: false, classes: true, variables: true},
+      { functions: false, classes: true, variables: true },
     ],
     'import/no-extraneous-dependencies': [
       'error',
@@ -36,12 +36,12 @@ module.exports = {
       },
     ],
     // for lambda layer imports starting with /opt/nodejs/ directory
-    'import/no-unresolved': ['warn', {ignore: ['/opt/*']}],
+    'import/no-unresolved': ['warn', { ignore: ['/opt/*'] }],
     'import/prefer-default-export': 'off',
     'lines-between-class-members': [
       'error',
       'always',
-      {exceptAfterSingleLine: true},
+      { exceptAfterSingleLine: true },
     ],
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
@@ -93,4 +93,4 @@ module.exports = {
       },
     },
   },
-};
+}

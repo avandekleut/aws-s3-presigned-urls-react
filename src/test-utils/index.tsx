@@ -1,8 +1,8 @@
-import { render as defaultRender } from '@testing-library/react';
-import { RouterContext } from 'next/dist/next-server/lib/router-context';
-import { NextRouter } from 'next/router';
+import { render as defaultRender } from '@testing-library/react'
+import { RouterContext } from 'next/dist/next-server/lib/router-context'
+import { NextRouter } from 'next/router'
 
-export * from '@testing-library/react';
+export * from '@testing-library/react'
 
 // --------------------------------------------------
 // Override the default test render with our own
@@ -13,9 +13,9 @@ export * from '@testing-library/react';
 //   router: { pathname: '/my-custom-pathname' },
 // });
 // --------------------------------------------------
-type DefaultParams = Parameters<typeof defaultRender>;
-type RenderUI = DefaultParams[0];
-type RenderOptions = DefaultParams[1] & { router?: Partial<NextRouter> };
+type DefaultParams = Parameters<typeof defaultRender>
+type RenderUI = DefaultParams[0]
+type RenderOptions = DefaultParams[1] & { router?: Partial<NextRouter> }
 
 const mockRouter: NextRouter = {
   basePath: '',
@@ -38,11 +38,11 @@ const mockRouter: NextRouter = {
   isFallback: false,
   isLocaleDomain: true,
   isPreview: false,
-};
+}
 
 export function render(
   ui: RenderUI,
-  { wrapper, router, ...options }: RenderOptions = {},
+  { wrapper, router, ...options }: RenderOptions = {}
 ) {
   if (!wrapper) {
     // eslint-disable-next-line no-param-reassign, react/display-name
@@ -50,8 +50,8 @@ export function render(
       <RouterContext.Provider value={{ ...mockRouter, ...router }}>
         {children}
       </RouterContext.Provider>
-    );
+    )
   }
 
-  return defaultRender(ui, { wrapper, ...options });
+  return defaultRender(ui, { wrapper, ...options })
 }

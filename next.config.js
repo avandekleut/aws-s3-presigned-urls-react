@@ -4,7 +4,7 @@
  */
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-});
+})
 
 module.exports = withBundleAnalyzer({
   pageExtensions: ['page.js', 'page.jsx', 'page.ts', 'page.tsx'],
@@ -20,8 +20,8 @@ module.exports = withBundleAnalyzer({
           },
         },
       ],
-    });
+    })
 
-    return config;
+    return config
   },
-});
+})

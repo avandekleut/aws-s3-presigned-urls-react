@@ -1,10 +1,10 @@
-import '@styles/tailwind.css';
-import { AppProps } from 'next/app';
-import Head from 'next/head';
-import { StrictMode } from 'react';
+import '@styles/tailwind.css'
+import { AppProps } from 'next/app'
+import Head from 'next/head'
+import { StrictMode } from 'react'
 
 const App: React.FC<AppProps> = ({ Component, pageProps }) => {
-  console.log('this is the app component');
+  console.log('this is the app component')
   return (
     <StrictMode>
       <Head>
@@ -15,7 +15,7 @@ const App: React.FC<AppProps> = ({ Component, pageProps }) => {
         <Component {...pageProps} />
       </div>
     </StrictMode>
-  );
-};
+  )
+}
 
-export default App;
+export default App

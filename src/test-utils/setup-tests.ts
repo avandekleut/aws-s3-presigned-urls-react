@@ -6,44 +6,44 @@ const localStorageMock = {
   setItem: jest.fn(),
   clear: jest.fn(),
   removeItem: jest.fn(),
-};
+}
 // eslint-disable-next-line
-window.localStorage.__proto__ = localStorageMock;
+window.localStorage.__proto__ = localStorageMock
 
-window.scrollTo = jest.fn();
+window.scrollTo = jest.fn()
 
-(window.IntersectionObserver as jest.Mock) = jest.fn(() => ({
+;(window.IntersectionObserver as jest.Mock) = jest.fn(() => ({
   observe: jest.fn(),
-}));
+}))
 
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {
-    this.root = null;
-    this.rootMargin = '';
-    this.thresholds = [];
+    this.root = null
+    this.rootMargin = ''
+    this.thresholds = []
   }
 
-  readonly root: Element | null;
+  readonly root: Element | null
 
-  readonly rootMargin: string;
+  readonly rootMargin: string
 
-  readonly thresholds: ReadonlyArray<number>;
+  readonly thresholds: ReadonlyArray<number>
 
   disconnect() {
-    return null;
+    return null
   }
 
   observe() {
-    return null;
+    return null
   }
 
   takeRecords(): IntersectionObserverEntry[] {
-    return [];
+    return []
   }
 
   unobserve() {
-    return null;
+    return null
   }
-};
+}
 
-export {};
+export {}
