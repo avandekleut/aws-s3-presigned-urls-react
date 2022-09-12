@@ -51,7 +51,7 @@ const Home: React.FC = () => {
                   </span>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     id="picture"
                     name="picture"
                     className="hidden"
@@ -66,8 +66,14 @@ const Home: React.FC = () => {
                 </button>
               </div>
             </form>
-            <span className="inline-block w-96 h-96">
-              <img src={s3FileUrl || ''} alt="" />
+            {/* <span className="inline-block w-96 h-96"> */}
+            <span>
+              <button
+                type="submit"
+                className="px-1 py-2 my-6 border-2 border-green-400 rounded-md hover:bg-purple-200"
+              >
+                {s3FileUrl && <a href={s3FileUrl || ''}>Download Results</a>}
+              </button>
             </span>
           </div>
         </div>

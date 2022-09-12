@@ -3,7 +3,12 @@ import * as apiGatewayIntegrations from '@aws-cdk/aws-apigatewayv2-integrations-
 import * as lambda from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import * as s3 from 'aws-cdk-lib/aws-s3'
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment'
+import * as s3assets from 'aws-cdk-lib/aws-s3-assets'
 import * as cdk from 'aws-cdk-lib'
+import { Construct } from 'constructs'
 import path from 'path'
 import {
   DEPLOY_ENVIRONMENT,
@@ -11,11 +16,48 @@ import {
   STACK_PREFIX,
 } from './constants'
 
+class WebsiteBucket extends Construct {
+  public readonly bucket: s3.Bucket
+  public readonly origin: origins.S3Origin
+  public readonly originAccessIdentity: cloudfront.OriginAccessIdentity
+  // public readonly originAccessIdentity:
+
+  constructor(scope: Construct, id: string) {
+    super(scope, id)
+
+    this.bucket = new s3.Bucket(this, `${id}-bucket`, {
+      websiteErrorDocument: 'index.html',
+      websiteIndexDocument: 'index.html',
+      publicReadAccess: false,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+    })
+
+    this.originAccessIdentity = new cloudfront.OriginAccessIdentity(
+      this,
+      `${id}-origin-access-identity`
+    )
+    this.bucket.grantRead(this.originAccessIdentity)
+
+    this.origin = new origins.S3Origin(this.bucket, {
+      originAccessIdentity: this.originAccessIdentity,
+    })
+
+    // new s3deploy.BucketDeployment(this, 'DeployReactApp', {
+    //   sources: [
+    //     s3deploy.Source.asset(path.join(__dirname, '..', 'website', 'build')),
+    //   ],
+    //   destinationBucket: this.bucket,
+    // })
+  }
+}
+
 export class PresignedUrlStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
 
-    const s3Bucket = new s3.Bucket(this, id, {
+    const websiteBucket = new WebsiteBucket(this, 'website-bucket')
+
+    const filesBucket = new s3.Bucket(this, id, {
       cors: [
         {
           allowedMethods: [
@@ -61,12 +103,12 @@ export class PresignedUrlStack extends cdk.Stack {
         timeout: cdk.Duration.seconds(5),
         handler: 'main',
         entry: path.join(__dirname, '/../src/get-presigned-url-s3/index.ts'),
-        environment: { BUCKET_NAME: s3Bucket.bucketName },
+        environment: { BUCKET_NAME: filesBucket.bucketName },
       }
     )
 
-    s3Bucket.grantPut(getPresignedUrlFunction)
-    s3Bucket.grantPutAcl(getPresignedUrlFunction)
+    filesBucket.grantPut(getPresignedUrlFunction)
+    filesBucket.grantPutAcl(getPresignedUrlFunction)
 
     httpApi.addRoutes({
       path: '/get-presigned-url-s3',
@@ -82,6 +124,6 @@ export class PresignedUrlStack extends cdk.Stack {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       value: httpApi.url!,
     })
-    new cdk.CfnOutput(this, 'bucketName', { value: s3Bucket.bucketName })
+    new cdk.CfnOutput(this, 'bucketName', { value: filesBucket.bucketName })
   }
 }

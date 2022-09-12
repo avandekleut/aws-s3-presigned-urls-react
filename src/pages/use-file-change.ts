@@ -30,10 +30,11 @@ export function useFileChange() {
     console.log('fileObj is', fileObj)
 
     const [type] = fileObj.type.split('/')
-    if (!type || type !== 'image') {
+    console.log({ type })
+    if (!type || type !== 'application') {
       fileDispatch({
         type: 'FILE_CHANGE_FAILURE',
-        fileError: 'You can only upload image files.',
+        fileError: 'You can only upload .xsl(s) files.',
       })
       return
     }
