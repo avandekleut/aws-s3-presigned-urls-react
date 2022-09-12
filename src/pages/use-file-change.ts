@@ -15,7 +15,7 @@ function bytesToMb(bytes: number) {
   return mb
 }
 
-export function useFileChange() {
+export function useFileChange(callback?: () => void) {
   const [
     { fileError, fileContents, fileName, fileSize, fileType },
     fileDispatch,
@@ -26,6 +26,8 @@ export function useFileChange() {
     if (!fileObj) {
       return
     }
+
+    callback && callback()
 
     console.log('fileObj is', fileObj)
 
