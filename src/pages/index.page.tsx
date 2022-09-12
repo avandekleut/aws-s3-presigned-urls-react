@@ -31,9 +31,16 @@ const Home: React.FC = () => {
 
     try {
       if (fileType && fileContents) {
-        const filePath = await uploadToS3({ fileType, fileContents })
-        setS3FileUrl(`${S3_BUCKET_URL}/${filePath}`)
-        console.log('filePath is', filePath)
+        const {
+          presignedGet,
+          presignedPost,
+          uploadFilePath,
+          downloadFilePath,
+        } = await uploadToS3({
+          fileType,
+          fileContents,
+        })
+        setS3FileUrl(presignedGet)
         fileDispatch({ type: 'RESET_FILE_STATE' })
         setDownloadVisible(true)
         setGenerateVisible(false)
@@ -87,12 +94,11 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </form>
-            {/* <span className="inline-block w-96 h-96"> */}
             <span>
               {downloadVisible && (
                 <button
                   type="submit"
-                  className="px-1 py-2 my-6 border-2 border-green-400 rounded-md hover:bg-green-200"
+                  className="px-1 py-2 my-6 border-2 border-green-400 rounded-md hover:bg-blue-200"
                 >
                   <a href={s3FileUrl || ''}>Download Matchings</a>
                 </button>

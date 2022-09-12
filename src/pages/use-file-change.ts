@@ -36,7 +36,7 @@ export function useFileChange(callback?: () => void) {
     if (!type || type !== 'application') {
       fileDispatch({
         type: 'FILE_CHANGE_FAILURE',
-        fileError: 'You can only upload .xsl(s) files.',
+        fileError: 'You can only upload .xsl(x) files.',
       })
       return
     }

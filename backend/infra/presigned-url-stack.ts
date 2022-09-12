@@ -108,6 +108,7 @@ export class PresignedUrlStack extends cdk.Stack {
     )
 
     filesBucket.grantPut(getPresignedUrlFunction)
+    filesBucket.grantReadWrite(getPresignedUrlFunction)
     filesBucket.grantPutAcl(getPresignedUrlFunction)
 
     httpApi.addRoutes({

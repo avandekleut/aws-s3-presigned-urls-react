@@ -8,38 +8,45 @@ export async function uploadToS3({
   fileType: string
   fileContents: File
 }) {
-  const presignedPostUrl = await getPresignedPostUrl(fileType)
+  const { presignedGet, presignedPost, uploadFilePath, downloadFilePath } =
+    await getPresignedPostUrl(fileType)
+
+  console.log({ presignedGet, presignedPost, uploadFilePath, downloadFilePath })
 
   const formData = new FormData()
   formData.append('Content-Type', fileType)
-  Object.entries(presignedPostUrl.fields).forEach(([k, v]) => {
+  Object.entries(presignedPost.fields).forEach(([k, v]) => {
     formData.append(k, v)
   })
   formData.append('file', fileContents) // The file has be the last element
 
-  await axios.post(presignedPostUrl.url, formData, {
+  const response = await axios.post<unknown>(presignedPost.url, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
 
-  return presignedPostUrl.filePath
+  return { presignedGet, presignedPost, uploadFilePath, downloadFilePath }
 }
 
 type PresignedPostUrlResponse = {
-  url: string
-  fields: {
-    key: string
-    acl: string
-    bucket: string
+  presignedPost: {
+    url: string
+    fields: {
+      key: string
+      acl: string
+      bucket: string
+    }
   }
-  filePath: string
+  presignedGet: string
+  uploadFilePath: string
+  downloadFilePath: string
 }
 
 const GET_PRESIGNED_URL_API_PATH = 'get-presigned-url-s3'
 
 async function getPresignedPostUrl(fileType: string) {
-  const { data: presignedPostUrl } = await axios.get<PresignedPostUrlResponse>(
+  const { data } = await axios.get<PresignedPostUrlResponse>(
     `${API_BASE_URL}/${GET_PRESIGNED_URL_API_PATH}?fileType=${fileType}`
   )
 
-  return presignedPostUrl
+  return data
 }

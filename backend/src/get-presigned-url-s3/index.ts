@@ -3,12 +3,22 @@ import type {
   APIGatewayProxyResultV2,
 } from 'aws-lambda'
 import { S3 } from 'aws-sdk'
+import { v4 as uuidv4 } from 'uuid'
 
 if (!process.env.BUCKET_NAME)
   throw new Error('Environment variable Bucket name is required.')
 
 type Event = APIGatewayProxyEventV2 & {
   queryStringParameters: { fileType: string }
+}
+
+const s3 = new S3()
+
+type GetPresignedPostUrlResponse = {
+  presignedPost: S3.PresignedPost
+  presignedGet: string
+  uploadFilePath: string
+  downloadFilePath: string
 }
 
 export async function main(event: Event): Promise<APIGatewayProxyResultV2> {
@@ -20,16 +30,33 @@ export async function main(event: Event): Promise<APIGatewayProxyResultV2> {
       )
 
     const { fileType } = event.queryStringParameters
-    const filePath = generateId()
-    const presignedPost = await createPresignedPost({ fileType, filePath })
+
+    const uuid = uuidv4()
+
+    console.log({ uuid })
+
+    const uploadFilePath = `${uuid}/preferences.xlsx`
+    const presignedPost = await createPresignedPost({
+      fileType,
+      filePath: uploadFilePath,
+    })
+
+    const downloadFilePath = `${uuid}/matching.json`
+    const presignedGet = createPresignedGet({
+      filePath: uploadFilePath,
+    })
+
+    const response: GetPresignedPostUrlResponse = {
+      presignedPost,
+      presignedGet,
+      uploadFilePath,
+      downloadFilePath,
+    }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...presignedPost,
-        filePath,
-      }),
+      body: JSON.stringify(response),
     }
   } catch (error: unknown) {
     console.log('ERROR is:', error)
@@ -48,13 +75,18 @@ type GetPresignedPostUrlParams = {
   filePath: string
 }
 
+type GetPresignedGetUrlParams = {
+  filePath: string
+}
+
 export function createPresignedPost({
   fileType,
   filePath,
 }: GetPresignedPostUrlParams): Promise<S3.PresignedPost> {
-  const params = {
+  const params: S3.PresignedPost.Params = {
     Bucket: process.env.BUCKET_NAME,
     Fields: { key: filePath, acl: 'public-read' },
+    // Fields: { key: filePath },
     Conditions: [
       // content length restrictions: 0-1MB]
       ['content-length-range', 0, 1000000],
@@ -66,21 +98,15 @@ export function createPresignedPost({
     Expires: 15,
   }
 
-  const s3 = new S3()
   return s3.createPresignedPost(params) as unknown as Promise<S3.PresignedPost>
 }
 
-function generateId() {
-  let result = ''
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!-.*()'
-  const length = 10
-
-  const charactersLength = characters.length
-  for (let i = 0; i < length; i += 1) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength))
-  }
-
-  const date = new Date().toISOString().split('T')[0].replace(/-/g, '')
-  return `${date}_${result}`
+export function createPresignedGet({
+  filePath,
+}: GetPresignedGetUrlParams): string {
+  return s3.getSignedUrl('getObject', {
+    Bucket: process.env.BUCKET_NAME,
+    Key: filePath,
+    Expires: 60 * 60,
+  })
 }
