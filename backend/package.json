@@ -1,0 +1,61 @@
+{
+  "scripts": {
+    "setup": "npm install && npm install --prefix src/",
+    "cdk-bootstrap": "npx aws-cdk bootstrap",
+    "cdk-synth": "npx aws-cdk synth presigned-url-dev",
+    "cdk-deploy": "npx aws-cdk deploy presigned-url-dev --outputs-file ../src/cdk-exports-dev.json",
+    "cdk-create-stack": "npm run cdk-bootstrap && npm run cdk-deploy",
+    "cdk-destroy": "npx aws-cdk destroy presigned-url-dev",
+    "test": "jest",
+    "watch": "tsc -w",
+    "build": "tsc",
+    "cdk": "cdk",
+    "type-check": "tsc --project tsconfig.json --pretty --noEmit",
+    "lint": "eslint . --ext js,jsx,ts,tsx --fix"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.20.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.20.0-alpha.0",
+    "aws-cdk-lib": "^2.20.0",
+    "constructs": "^10.0.112",
+    "source-map-support": "^0.5.21",
+    "yup": "^0.32.11"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.23",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
+    "aws-cdk": "^2.20.0",
+    "esbuild": "^0.14.36",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^2.7.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^26.1.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.5.1",
+    "prettier": "^2.6.2",
+    "ts-jest": "^27.1.4",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3"
+  },
+  "name": "aws-s3-uploads-react-cdk",
+  "version": "1.0.0",
+  "description": "How to upload files to s3 using presigned urls, infrastructure is provisioned using CDK",
+  "keywords": [
+    "aws",
+    "cdk",
+    "typescript",
+    "lambda"
+  ],
+  "tags": [
+    "aws",
+    "cdk",
+    "typescript",
+    "lambda"
+  ],
+  "author": "Borislav Hadzhiev",
+  "license": "MIT",
+  "private": true
+}
