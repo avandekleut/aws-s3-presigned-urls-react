@@ -20,7 +20,6 @@ class WebsiteBucket extends Construct {
   public readonly bucket: s3.Bucket
   public readonly origin: origins.S3Origin
   public readonly originAccessIdentity: cloudfront.OriginAccessIdentity
-  // public readonly originAccessIdentity:
 
   constructor(scope: Construct, id: string) {
     super(scope, id)
@@ -43,9 +42,7 @@ class WebsiteBucket extends Construct {
     })
 
     // new s3deploy.BucketDeployment(this, 'DeployReactApp', {
-    //   sources: [
-    //     s3deploy.Source.asset(path.join(__dirname, '..', 'website', 'build')),
-    //   ],
+    //   sources: [s3deploy.Source.asset(path.join(__dirname, '..', '..', 'out'))],
     //   destinationBucket: this.bucket,
     // })
   }
@@ -65,7 +62,8 @@ export class PresignedUrlStack extends cdk.Stack {
             s3.HttpMethods.POST,
             s3.HttpMethods.PUT,
           ],
-          allowedOrigins: [FRONTEND_BASE_URL],
+          // allowedOrigins: [FRONTEND_BASE_URL],
+          allowedOrigins: ['*'],
           allowedHeaders: ['*'],
         },
       ],
@@ -89,8 +87,10 @@ export class PresignedUrlStack extends cdk.Stack {
           apiGateway.CorsHttpMethod.PATCH,
           apiGateway.CorsHttpMethod.DELETE,
         ],
-        allowCredentials: true,
-        allowOrigins: [FRONTEND_BASE_URL],
+        // allowCredentials: true
+        // allowOrigins: [FRONTEND_BASE_URL],
+        allowCredentials: false,
+        allowOrigins: ['*'],
       },
     })
 
