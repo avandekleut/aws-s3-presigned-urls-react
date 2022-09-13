@@ -27,8 +27,9 @@ class WebsiteBucket extends Construct {
     this.bucket = new s3.Bucket(this, `${id}-bucket`, {
       websiteErrorDocument: 'index.html',
       websiteIndexDocument: 'index.html',
-      publicReadAccess: false,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      // publicReadAccess: false,
+      // blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      publicReadAccess: true,
     })
 
     this.originAccessIdentity = new cloudfront.OriginAccessIdentity(
@@ -41,10 +42,10 @@ class WebsiteBucket extends Construct {
       originAccessIdentity: this.originAccessIdentity,
     })
 
-    // new s3deploy.BucketDeployment(this, 'DeployReactApp', {
-    //   sources: [s3deploy.Source.asset(path.join(__dirname, '..', '..', 'out'))],
-    //   destinationBucket: this.bucket,
-    // })
+    new s3deploy.BucketDeployment(this, 'DeployReactApp', {
+      sources: [s3deploy.Source.asset(path.join(__dirname, '..', '..', 'out'))],
+      destinationBucket: this.bucket,
+    })
   }
 }
 
