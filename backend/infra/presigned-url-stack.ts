@@ -2,11 +2,16 @@ import * as apiGateway from '@aws-cdk/aws-apigatewayv2-alpha'
 import * as apiGatewayIntegrations from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
 import * as lambda from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
+import {
+  PythonFunction,
+  PythonLayerVersion,
+} from '@aws-cdk/aws-lambda-python-alpha'
 import * as s3 from 'aws-cdk-lib/aws-s3'
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment'
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets'
+import { S3EventSource } from 'aws-cdk-lib/aws-lambda-event-sources'
 import * as cdk from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 import path from 'path'
@@ -69,6 +74,38 @@ export class PresignedUrlStack extends cdk.Stack {
         },
       ],
     })
+
+    const pythonEntryPoint = path.join(
+      __dirname,
+      '..',
+      'src-python',
+      'eventHandler'
+    )
+    const generateMatchingsLambda = new PythonFunction(
+      this,
+      'generate-matchings-lambda',
+      {
+        entry: pythonEntryPoint,
+        index: 'index.py',
+        handler: 'handler',
+        functionName: 'generate-matchings',
+        runtime: lambda.Runtime.PYTHON_3_7,
+        layers: [
+          new PythonLayerVersion(this, 'generate-matchings-layer', {
+            entry: pythonEntryPoint,
+            compatibleRuntimes: [lambda.Runtime.PYTHON_3_7], // only supported version
+          }),
+        ],
+      }
+    )
+    filesBucket.grantReadWrite(generateMatchingsLambda)
+
+    generateMatchingsLambda.addEventSource(
+      new S3EventSource(filesBucket, {
+        events: [s3.EventType.OBJECT_CREATED],
+        // filters: [{ prefix: 'subdir/' }], // optional
+      })
+    )
 
     const httpApi = new apiGateway.HttpApi(this, 'api', {
       description: `___${DEPLOY_ENVIRONMENT}___ Api for ${STACK_PREFIX}`,
