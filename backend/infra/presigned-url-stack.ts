@@ -86,6 +86,8 @@ export class PresignedUrlStack extends cdk.Stack {
       this,
       'DockerImageFunction',
       {
+        functionName: 'generate-matchings',
+        timeout: cdk.Duration.seconds(900),
         code: lambda.DockerImageCode.fromImageAsset(pythonEntryPoint),
       }
     )

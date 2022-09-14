@@ -1,6 +1,7 @@
 import json
 import urllib.parse
 import boto3
+import io
 
 from matching_generator.profile import Profile
 from matching_generator.preference_sheet_parser import PreferenceSheetParser
@@ -11,25 +12,14 @@ print('Loading function')
 s3 = boto3.client('s3')
 
 
-def generate_matchings(filename):
-    ranks = PreferenceSheetParser.generate_ranks('Sept 13 Copy of 2022 Set Draft.xlsx')
+def generate_matchings(file):
+    ranks = PreferenceSheetParser.generate_ranks(file)
 
     matching = MatchingGenerator.generate_matching(ranks, strategy='RMA')
 
     profile = Profile.compute_profile_from_result(ranks, matching)
 
-    with open('matching.json', 'w+') as f:
-        f.write(json.dumps(matching, indent=2))
-
-
-    with open('ranks.json', 'w+') as f:
-        for applicant in ranks:
-            for job in ranks[applicant]:
-                ranks[applicant][job] = int(ranks[applicant][job])
-        
-        f.write(json.dumps(ranks, indent=2))
-
-    return {'ranks': ranks, 'matching': matching, 'profile': profile}
+    return ranks, matching, profile
 
 
 def handler(event, context):
@@ -39,9 +29,26 @@ def handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
     try:
-        response = s3.get_object(Bucket=bucket, Key=key)
-        print("CONTENT TYPE: " + response['ContentType'])
-        return response['ContentType']
+        uuid = key.split("/")[0] # folder name. Key is <uuid>/preferences.xlsx
+        obj = s3.get_object(Bucket=bucket, Key=key)
+
+        body = io.BytesIO(obj['Body'].read())
+        ranks, matching, profile = generate_matchings(body)
+
+        s3.put_object(
+            Body=json.dumps(ranks, indent=4, ensure_ascii=False),
+            Bucket=bucket,
+            Key=f'{uuid}/ranks.json'
+        )
+
+        s3.put_object(
+            Body=json.dumps(matching, indent=4, ensure_ascii=False),
+            Bucket=bucket,
+            Key=f'{uuid}/matching.json'
+        )
+
+        return {"profile": profile, "ranks": ranks, "matching":matching}
+
     except Exception as e:
         print(e)
         print('Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(key, bucket))
@@ -86,4 +93,3 @@ if __name__ == '__main__':
         ]
         }
     response = handler(event, None)
-    print({response})

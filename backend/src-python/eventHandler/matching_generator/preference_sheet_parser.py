@@ -3,8 +3,8 @@ import pandas as pd
 
 class PreferenceSheetParser:
     @staticmethod
-    def generate_ranks(filename, ignore_sheet_names=['Inventory', 'Black Six', 'Info', 'Participants']):
-        xlsx = pd.ExcelFile(filename)
+    def generate_ranks(file, ignore_sheet_names=['Inventory', 'Black Six', 'Info', 'Participants']):
+        xlsx = pd.ExcelFile(file)
         rankings = {}
 
         total_quantity = xlsx.parse()['Total Quantity'].sum()
