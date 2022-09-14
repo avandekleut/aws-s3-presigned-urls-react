@@ -90,35 +90,13 @@ export class PresignedUrlStack extends cdk.Stack {
       }
     )
 
-    // const generateMatchingsLayer = new PythonLayerVersion(
-    //   this,
-    //   'generate-matchings-layer',
-    //   {
-    //     entry: pythonEntryPoint,
-    //     compatibleRuntimes: [lambda.Runtime.PYTHON_3_7], // only supported version
-    //   }
-    // )
+    filesBucket.grantReadWrite(generateMatchingsLambda)
 
-    // const generateMatchingsLambda = new PythonFunction(
-    //   this,
-    //   'generate-matchings-lambda',
-    //   {
-    //     entry: pythonEntryPoint,
-    //     index: 'index.py',
-    //     handler: 'handler',
-    //     functionName: 'generate-matchings',
-    //     runtime: lambda.Runtime.PYTHON_3_7,
-    //     layers: [],
-    //   }
-    // )
-    // filesBucket.grantReadWrite(generateMatchingsLambda)
-
-    // generateMatchingsLambda.addEventSource(
-    //   new S3EventSource(filesBucket, {
-    //     events: [s3.EventType.OBJECT_CREATED],
-    //     // filters: [{ prefix: 'subdir/' }], // optional
-    //   })
-    // )
+    generateMatchingsLambda.addEventSource(
+      new S3EventSource(filesBucket, {
+        events: [s3.EventType.OBJECT_CREATED],
+      })
+    )
 
     const httpApi = new apiGateway.HttpApi(this, 'api', {
       description: `___${DEPLOY_ENVIRONMENT}___ Api for ${STACK_PREFIX}`,
