@@ -39,7 +39,7 @@ const Home: React.FC = () => {
         if (response.status === 200) {
           console.log('Available!')
           setState({
-            generateVisible: false,
+            ...state,
             loading: false,
             downloadVisible: true,
           })
@@ -89,11 +89,12 @@ const Home: React.FC = () => {
         })
 
         setS3FileUrl(presignedGet)
-        fileDispatch({ type: 'RESET_FILE_STATE' })
+        // fileDispatch({ type: 'RESET_FILE_STATE' })
         setState({
+          ...state,
           loading: true,
           downloadVisible: false,
-          generateVisible: false,
+          // generateVisible: false,
         })
       } else {
         console.log('Did not run callback')
@@ -144,16 +145,16 @@ const Home: React.FC = () => {
                 <div>{state.loading && <CircularProgress />}</div>
               </div>
             </form>
-            <span>
+            <div className="flex flex-col items-center mt-2">
               {state.downloadVisible && (
                 <button
                   type="submit"
-                  className="px-1 py-2 my-6 border-2 border-green-400 rounded-md hover:bg-blue-200"
+                  className="px-1 py-2 my-6 border-2 border-green-400 rounded-md background-color:bg-green-200"
                 >
                   <a href={s3FileUrl || ''}>Download Matchings</a>
                 </button>
               )}
-            </span>
+            </div>
           </div>
         </div>
       </div>
