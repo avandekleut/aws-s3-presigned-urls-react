@@ -81,6 +81,7 @@ export class PresignedUrlStack extends cdk.Stack {
       'src-python',
       'eventHandler'
     )
+
     const generateMatchingsLambda = new PythonFunction(
       this,
       'generate-matchings-lambda',
@@ -100,12 +101,12 @@ export class PresignedUrlStack extends cdk.Stack {
     )
     filesBucket.grantReadWrite(generateMatchingsLambda)
 
-    generateMatchingsLambda.addEventSource(
-      new S3EventSource(filesBucket, {
-        events: [s3.EventType.OBJECT_CREATED],
-        // filters: [{ prefix: 'subdir/' }], // optional
-      })
-    )
+    // generateMatchingsLambda.addEventSource(
+    //   new S3EventSource(filesBucket, {
+    //     events: [s3.EventType.OBJECT_CREATED],
+    //     // filters: [{ prefix: 'subdir/' }], // optional
+    //   })
+    // )
 
     const httpApi = new apiGateway.HttpApi(this, 'api', {
       description: `___${DEPLOY_ENVIRONMENT}___ Api for ${STACK_PREFIX}`,
