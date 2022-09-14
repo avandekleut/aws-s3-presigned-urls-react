@@ -82,24 +82,36 @@ export class PresignedUrlStack extends cdk.Stack {
       'eventHandler'
     )
 
-    const generateMatchingsLambda = new PythonFunction(
+    const generateMatchingsLambda = new lambda.DockerImageFunction(
       this,
-      'generate-matchings-lambda',
+      'DockerImageFunction',
       {
-        entry: pythonEntryPoint,
-        index: 'index.py',
-        handler: 'handler',
-        functionName: 'generate-matchings',
-        runtime: lambda.Runtime.PYTHON_3_7,
-        layers: [
-          new PythonLayerVersion(this, 'generate-matchings-layer', {
-            entry: pythonEntryPoint,
-            compatibleRuntimes: [lambda.Runtime.PYTHON_3_7], // only supported version
-          }),
-        ],
+        code: lambda.DockerImageCode.fromImageAsset(pythonEntryPoint),
       }
     )
-    filesBucket.grantReadWrite(generateMatchingsLambda)
+
+    // const generateMatchingsLayer = new PythonLayerVersion(
+    //   this,
+    //   'generate-matchings-layer',
+    //   {
+    //     entry: pythonEntryPoint,
+    //     compatibleRuntimes: [lambda.Runtime.PYTHON_3_7], // only supported version
+    //   }
+    // )
+
+    // const generateMatchingsLambda = new PythonFunction(
+    //   this,
+    //   'generate-matchings-lambda',
+    //   {
+    //     entry: pythonEntryPoint,
+    //     index: 'index.py',
+    //     handler: 'handler',
+    //     functionName: 'generate-matchings',
+    //     runtime: lambda.Runtime.PYTHON_3_7,
+    //     layers: [],
+    //   }
+    // )
+    // filesBucket.grantReadWrite(generateMatchingsLambda)
 
     // generateMatchingsLambda.addEventSource(
     //   new S3EventSource(filesBucket, {
