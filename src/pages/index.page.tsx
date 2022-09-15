@@ -1,6 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react'
 import React from 'react'
-import { S3_BUCKET_URL } from 'src/constants'
 import CircularProgress from '@mui/material/CircularProgress'
 import { uploadToS3 } from './upload-file'
 import { useFileChange } from './use-file-change'
@@ -61,16 +60,15 @@ const Home: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // setState({
-    //   ...state,
-    //   loading: true,
-    //   downloadVisible: false,
-    // })
 
     console.log('handleSubmit')
 
     try {
       if (fileType && fileContents) {
+        setState({
+          ...state,
+          loading: true,
+        })
         const {
           presignedGet,
           presignedPost,
