@@ -43,7 +43,7 @@ export async function main(event: Event): Promise<APIGatewayProxyResultV2> {
 
     const downloadFilePath = `${uuid}/matching.json`
     const presignedGet = createPresignedGet({
-      filePath: uploadFilePath,
+      filePath: downloadFilePath,
     })
 
     const response: GetPresignedPostUrlResponse = {

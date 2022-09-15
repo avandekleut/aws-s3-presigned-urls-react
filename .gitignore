@@ -56,3 +56,7 @@ amplifytools.xcconfig
 
 
 cdk-exports-dev.json
+
+# python
+**__pycache__
+*.pyc

@@ -25,16 +25,14 @@ class WebsiteBucket extends Construct {
   public readonly bucket: s3.Bucket
   public readonly origin: origins.S3Origin
   public readonly originAccessIdentity: cloudfront.OriginAccessIdentity
+  public readonly distribution: cloudfront.Distribution
 
   constructor(scope: Construct, id: string) {
     super(scope, id)
 
     this.bucket = new s3.Bucket(this, `${id}-bucket`, {
-      websiteErrorDocument: 'index.html',
-      websiteIndexDocument: 'index.html',
-      // publicReadAccess: false,
-      // blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      publicReadAccess: true,
+      publicReadAccess: false,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     })
 
     this.originAccessIdentity = new cloudfront.OriginAccessIdentity(
@@ -50,6 +48,14 @@ class WebsiteBucket extends Construct {
     new s3deploy.BucketDeployment(this, 'DeployReactApp', {
       sources: [s3deploy.Source.asset(path.join(__dirname, '..', '..', 'out'))],
       destinationBucket: this.bucket,
+    })
+
+    // Origin access id?
+    this.distribution = new cloudfront.Distribution(this, 'Distribution', {
+      defaultBehavior: {
+        origin: this.origin,
+      },
+      defaultRootObject: 'index.html',
     })
   }
 }
@@ -81,29 +87,23 @@ export class PresignedUrlStack extends cdk.Stack {
       'src-python',
       'eventHandler'
     )
-    const generateMatchingsLambda = new PythonFunction(
+
+    const generateMatchingsLambda = new lambda.DockerImageFunction(
       this,
-      'generate-matchings-lambda',
+      'DockerImageFunction',
       {
-        entry: pythonEntryPoint,
-        index: 'index.py',
-        handler: 'handler',
         functionName: 'generate-matchings',
-        runtime: lambda.Runtime.PYTHON_3_7,
-        layers: [
-          new PythonLayerVersion(this, 'generate-matchings-layer', {
-            entry: pythonEntryPoint,
-            compatibleRuntimes: [lambda.Runtime.PYTHON_3_7], // only supported version
-          }),
-        ],
+        memorySize: 3072,
+        timeout: cdk.Duration.seconds(900),
+        code: lambda.DockerImageCode.fromImageAsset(pythonEntryPoint),
       }
     )
+
     filesBucket.grantReadWrite(generateMatchingsLambda)
 
     generateMatchingsLambda.addEventSource(
       new S3EventSource(filesBucket, {
         events: [s3.EventType.OBJECT_CREATED],
-        // filters: [{ prefix: 'subdir/' }], // optional
       })
     )
 
@@ -163,6 +163,14 @@ export class PresignedUrlStack extends cdk.Stack {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       value: httpApi.url!,
     })
-    new cdk.CfnOutput(this, 'bucketName', { value: filesBucket.bucketName })
+    new cdk.CfnOutput(this, 'filesBucketName', {
+      value: filesBucket.bucketName,
+    })
+    new cdk.CfnOutput(this, 'websiteBucketUrl', {
+      value: websiteBucket.bucket.bucketWebsiteUrl,
+    })
+    new cdk.CfnOutput(this, 'cloudfrontUrl', {
+      value: websiteBucket.distribution.distributionDomainName,
+    })
   }
 }

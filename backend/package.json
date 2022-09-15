@@ -3,7 +3,7 @@
     "setup": "npm install && npm install --prefix src/",
     "cdk-bootstrap": "npx aws-cdk bootstrap",
     "cdk-synth": "npx aws-cdk synth presigned-url-dev",
-    "cdk-deploy": "npx --ignore-existing  aws-cdk deploy presigned-url-dev --outputs-file ../src/cdk-exports-dev.json",
+    "cdk-deploy": "npx aws-cdk deploy presigned-url-dev --outputs-file ../src/cdk-exports-dev.json",
     "cdk-create-stack": "npm run cdk-bootstrap && npm run cdk-deploy",
     "cdk-destroy": "npx aws-cdk destroy presigned-url-dev",
     "test": "jest",
@@ -14,10 +14,10 @@
     "lint": "eslint . --ext js,jsx,ts,tsx --fix"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.20.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.20.0-alpha.0",
-    "@aws-cdk/aws-lambda-python-alpha": "^2.20.0-alpha.0",
-    "aws-cdk-lib": "^2.20.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.41.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.41.0-alpha.0",
+    "@aws-cdk/aws-lambda-python-alpha": "^2.41.0-alpha.0",
+    "aws-cdk-lib": "^2.41.0",
     "constructs": "^10.0.112",
     "source-map-support": "^0.5.21",
     "yup": "^0.32.11"
