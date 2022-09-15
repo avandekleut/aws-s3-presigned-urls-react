@@ -41,11 +41,8 @@ class PreferenceSheetParser:
                 # the original relative order
                 if qty > 1:
                     for duplicate in range(1, qty):
-                        rankings[sheet_name][f'{name}_duplicate_{duplicate}'] = duplicate*lowest_rank + rank
-            
-#             # the method of reducing duplication probability above results in ranks that are much lower than 
-#             # the total quantity of items. We can thus re-normalize ranks to be between 0 and total_quantity-1
-#             rankings[sheet_name] = {k: i for i, (k, v) in enumerate(sorted(rankings[sheet_name].items(), key=lambda item: item[1]))}
+#                         rankings[sheet_name][f'{name}_duplicate_{duplicate}'] = duplicate*lowest_rank + rank
+                        rankings[sheet_name][f'{name}_duplicate_{duplicate}'] = lowest_rank + rank**duplicate
 
         assert all(map(lambda e: len(e) == total_quantity, rankings.values()))
         return rankings

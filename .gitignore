@@ -59,4 +59,5 @@ cdk-exports-dev.json
 
 # python
 **__pycache__
+**/*.ipynb_checkpoints/
 *.pyc
