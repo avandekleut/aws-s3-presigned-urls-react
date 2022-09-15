@@ -3,7 +3,7 @@ import pandas as pd
 
 class PreferenceSheetParser:
     @staticmethod
-    def generate_ranks(file, ignore_sheet_names=['Inventory', 'Black Six', 'Info', 'Participants']):
+    def generate_ranks(file, ignore_sheet_names=['Inventory', 'Info', 'Participants']):
         xlsx = pd.ExcelFile(file)
         rankings = {}
 
