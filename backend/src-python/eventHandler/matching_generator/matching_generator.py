@@ -1,5 +1,9 @@
 import numpy as np
 
+import re
+
+from copy import deepcopy
+
 from matching_generator.rank_maximal_allocation import RankMaximalAllocation
 from matching_generator.round_robin import RoundRobin
 
@@ -24,6 +28,8 @@ class MatchingGenerator:
         # their top choice first, and then remove the selected items from the pool, and run the process again.
         # we combine all of the results. 
         # in total, each person should receive at minimum floor(m/n) jobs.
+        
+        rankings_copy = deepcopy(rankings)
         
         applicants = list(rankings.keys())
         applicants_mapping = {applicant: i for i, applicant in enumerate(applicants)}
@@ -67,6 +73,19 @@ class MatchingGenerator:
                 applicant_name = applicants_inverse_mapping[applicant]
                 job_name = jobs_inverse_mapping[job]
                 matching[applicant_name].append(job_name)
+                
+                # reduce likelihood of dupes
+                # this is specific to bionilug
+                original_name_match = re.match('(.+)_duplicate_\d+', job_name)
+                if (original_name_match):
+                    original_name = original_name_match.group(1)
+                    print(f'Original name: {original_name}.')
+                    for remaining_job in rankings[applicant_name].keys():
+                        if re.match(original_name, remaining_job):
+                            print(f'Found duplicate match {applicant_name}:{remaining_job}')
+                            rankings[applicant_name][remaining_job] = total_jobs + rankings_copy[applicant_name][remaining_job]
+                else:
+                    print(f'No match found for {job_name}.')
                 
             for job in matched_jobs:
                 job_name = jobs_inverse_mapping[job]
